@@ -1,0 +1,64 @@
+<html>
+    <head>
+        <script src="web3.js"></script>
+        <script>
+            var Web3 = require('web3');
+            var web3 = new Web3();
+            //connect to the node
+            web3.setProvider(new
+            web3.providers.HttpProvider('http://localhost:8545'));
+            var account;
+            function sendMoney(toaccount, amount, password) {
+                web3.personal.sendTransaction({from: account, to: toaccount, value: web3.toWei(amount, "ether")}, password, (err, transaction) => {
+                    if (err) {
+                        document.getElementById('sendInfo').innerHTML = err;       
+                    }   
+                    else {
+                        document.getElementById('sendInfo').innerHTML = transaction;
+                    }     
+                });
+            }
+
+            function getMainAccount() {
+                web3.eth.getCoinbase((err, address) => {
+                    if (err) {
+                        document.getElementById('mainAddress').innerHTML = err;       
+                    }   
+                    else {
+                        account = address;
+                        document.getElementById('mainAddress').innerHTML = address;
+                        
+                        account = web3.eth.accounts[0]
+                        web3.eth.getBalance(account, (error,balance) =>{
+                            if (error) {
+                                document.getElementById('mainBalance').innerHTML =  error;
+                            }
+                            else {
+                                document.getElementById('mainBalance').innerHTML = web3.fromWei(balance,"ether") + ' ether';
+                            }
+                        });
+                    }
+                });
+            }
+
+        </script>
+    </head>
+    <body onload="getMainAccount()">
+        <h1>Node 1</h1>
+        <h1>Money Transfer</h1>
+        <hr>
+        <p>Address: <span id="mainAddress"></span></p>
+        <p>Balance: <span id="mainBalance"></span></p>
+        <hr>
+        <label>Transfer to: </label>
+        <input type="text" id="toaccount" style="width:500;"/>
+        <label>Amount (ether): </label>
+        <input type="text" id="amount"/>
+        <label>Pass Pharase: </label>
+        <input type="text" id="password"/>
+        <br>
+        <button type="button" onclick="sendMoney(document.getElementById('toaccount').value, document.getElementById('amount').value, document.getElementById('password').value)">Send</button>
+        <hr>
+        <p>Transaction Hash: <span id="sendInfo"></span></p>
+    </body>
+</html>
